@@ -18,7 +18,7 @@ import { check, validationResult } from "express-validator";
 router.post("/register",[check("firstName","FirstName is required").isString(),
     check("lastName","LastName is required").isString(),
     check("email","Email is required").isEmail(),
-    check("password","Password is required").isLength({min:6,max:8}),
+    check("password","Password is required").isLength({min:6}),
 
 ],async (req:any,res:any)=> {
     const  error=validationResult(req);
@@ -38,7 +38,7 @@ router.post("/register",[check("firstName","FirstName is required").isString(),
             }
         );
 
-        res.cookie("auth-token",token,{
+        res.cookie("auth_token",token,{
             httpOnly:true,
             secure:process.env.NODE_ENV !== "production",
             maxAge:86400000,
