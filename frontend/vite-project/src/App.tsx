@@ -2,6 +2,7 @@
 import './App.css'
 import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
 import Layout from "./layout/Layout.tsx";
+import Register from "./pages/Register.tsx";
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -17,6 +18,12 @@ function App() {
                 <p>Search page</p>
             </Layout>}/>
             <Route path="*" element={<Navigate to="/"/>}/>
+
+            <Route path="/register" element={<Layout>
+                <Register/>
+            </Layout>}/>
+
+
 
         </Routes>
 
