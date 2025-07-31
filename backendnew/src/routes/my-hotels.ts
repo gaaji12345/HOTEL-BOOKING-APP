@@ -29,38 +29,52 @@ router.post('/',verifyToken ,
             .withMessage("Facilities are required"),
     ],
     upload.array("imageFiles",6 ), async (req:Request, res:Response) =>{
-    try{
-        const imageFiles=req.files as Express.Multer.File[];
-        const newHotel:HotelType=req.body;
-        
+        try{
+            const imageFiles=req.files as Express.Multer.File[];
+            const newHotel:HotelType=req.body;
 
-        const uploadPromises=imageFiles.map(async (image) => {
-            const b64=Buffer.from(image.buffer).toString("base64");
-            let dataURI="data:"+image.mimetype+";base64"+b64;
-            const res =await cloudinary.v2.uploader.upload(dataURI);
-            return res.url;
-        });
 
-        const imageUrls=await Promise.all(uploadPromises);
+            const uploadPromises=imageFiles.map(async (image) => {
+                const b64=Buffer.from(image.buffer).toString("base64");
+                // let dataURI="data:"+image.mimetype+";base64"+b64;
+                const dataURI = "data:" + image.mimetype + ";base64," + b64;
 
-        // @ts-ignore
-        newHotel.imageUrls=imageUrls;
-        newHotel.lastUpdated=new Date();
-        if (req.userId != null) {
-            newHotel.userId = req.userId;
+                const res =await cloudinary.v2.uploader.upload(dataURI);
+                return res.url;
+            });
+
+            const imageUrls=await Promise.all(uploadPromises);
+
+            // @ts-ignore
+            newHotel.imageUrls=imageUrls;
+            newHotel.lastUpdated=new Date();
+            if (req.userId != null) {
+                newHotel.userId = req.userId;
+            }
+
+            const hotel=new Hotel(newHotel);
+            await hotel.save();
+
+            res.status(201).json(hotel);
+
+        }catch(e){
+            console.log("Error creating hotel",e);
+            res.status(500).json({message:"Something went wrong"});
+
         }
 
-        const hotel=new Hotel(newHotel);
-        await hotel.save();
+    })
 
-        res.status(201).json(hotel);
-
-    }catch(e){
-        console.log("Error creating hotel",e);
-        res.status(500).json({message:"Something went wrong"});
-
+// @ts-ignore
+router.get("/", verifyToken, async (req: Request, res: Response) => {
+    try {
+        const hotels = await Hotel.find({ userId: req.userId });
+        res.json(hotels);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching hotels" });
     }
+});
 
-})
+
 
 export default router;
