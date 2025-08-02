@@ -1,6 +1,6 @@
 import type {RegisterFormData} from "./pages/Register.tsx";
 import type {SignInFormData} from "./pages/SignIn.tsx";
-import type {HotelType} from '../../../backendnew/src/models/hotel.ts';
+import type {HotelType} from '../../../backendnew/src/shared/types.ts';
 
 const API_BASE_URL=import.meta.env.VITE_API_BASE_URL;
 
@@ -108,6 +108,20 @@ export const fetchMyHotels = async (): Promise<HotelType[]> => {
 
     return response.json();
 };
+
+export const fetchMyHotelById = async (hotelId: string): Promise<HotelType> => {
+    const response = await fetch(`${API_BASE_URL}/api/my-hotels/${hotelId}`, {
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        throw new Error("Error fetching Hotels");
+    }
+
+    return response.json();
+};
+
+
 
 
 
